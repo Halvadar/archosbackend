@@ -3,7 +3,7 @@ const card = require("../../Models/Cards");
 module.exports = {
   getCards: async (args, req) => {
     console.log(req.body);
-    const cards = await card.find({ category: args.category });
+    const cards = await card.find({});
     console.log(cards);
     return cards;
   },

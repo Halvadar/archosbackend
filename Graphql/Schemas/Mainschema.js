@@ -15,6 +15,7 @@ module.exports = buildSchema(`
         description:String!
         image:String!
         category:String!
+        score:[Int!]
     }
     type RootQuery {
         getCards(category:String):[Card!]!
