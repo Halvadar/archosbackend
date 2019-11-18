@@ -7,7 +7,8 @@ const Cards = new Schema({
   image: { required: true, type: String },
   description: { required: true, type: String },
   score: [Number],
-  category: { required: true, type: String }
+  category: { required: true, type: String },
+  subcategory: { required: true, type: String }
 });
 
 module.exports = mongoose.model("cards", Cards);

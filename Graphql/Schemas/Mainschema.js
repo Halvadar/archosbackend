@@ -8,6 +8,7 @@ module.exports = buildSchema(`
         image:String!
         score:[Int!]
         category:String!
+        subcategory:String!
     }
   
     input CardInput {
@@ -15,10 +16,15 @@ module.exports = buildSchema(`
         description:String!
         image:String!
         category:String!
-        score:[Int!]
+        score:[Int!]!
+        subcategory:String!
+    }
+    input GetCardInput {
+        category:String
+        subcategory:String
     }
     type RootQuery {
-        getCards(category:String):[Card!]!
+        getCards(Input:GetCardInput):[Card!]
     }
     type RootMutation {
         createCard(cardInput:CardInput):Card

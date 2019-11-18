@@ -5,16 +5,15 @@ const mongoose = require("mongoose");
 const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./Graphql/Schemas/Mainschema");
 const graphqlResolvers = require("./Graphql/Resolvers/Mainresolver");
-const card = require("./Models/Cards");
 const path = require("path");
 
 const app = express();
 app.use(bodyParser.json());
-
-app.use("/images", express.static(path.join(__dirname, "images")));
 app.use((req, res, next) => {
+  console.log("asdasd", req.body);
   next();
 });
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

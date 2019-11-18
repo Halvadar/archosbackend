@@ -2,8 +2,17 @@ const card = require("../../Models/Cards");
 
 module.exports = {
   getCards: async (args, req) => {
-    console.log(req.body);
-    const cards = await card.find({});
+    let cards;
+    console.log("asdfff");
+    try {
+      cards = await card.find({
+        category: args.Input.category,
+        subcategory: args.Input.subcategory
+      });
+    } catch (error) {
+      console.log("asd");
+      console.log(error);
+    }
     console.log(cards);
     return cards;
   },
@@ -12,7 +21,8 @@ module.exports = {
       title: args.cardInput.title,
       description: args.cardInput.description,
       image: args.cardInput.image,
-      category: args.cardInput.category
+      category: args.cardInput.category,
+      subcategory: args.cardInput.subcategory || ""
     });
     const createdCard = await newCard.save();
     return createdCard;
