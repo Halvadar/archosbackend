@@ -6,8 +6,7 @@ module.exports = {
     console.log("asdfff");
     try {
       cards = await card.find({
-        category: args.Input.category,
-        subcategory: args.Input.subcategory
+        ...args.Input
       });
     } catch (error) {
       console.log("asd");

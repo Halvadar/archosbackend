@@ -16,8 +16,7 @@ module.exports = buildSchema(`
         description:String!
         image:String!
         category:String!
-        score:[Int!]!
-        subcategory:String!
+        subcategory:String
     }
     input GetCardInput {
         category:String
