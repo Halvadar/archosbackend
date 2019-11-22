@@ -1,13 +1,21 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cardsrouter = require("./Routes/Categories");
 const mongoose = require("mongoose");
 const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./Graphql/Schemas/Mainschema");
 const graphqlResolvers = require("./Graphql/Resolvers/Mainresolver");
 const path = require("path");
+require("dotenv").config();
+const cors = require("cors");
 
 const app = express();
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.ORIGIN
+  })
+);
+
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   console.log("asdasd", req.body);
@@ -27,11 +35,12 @@ app.use((req, res, next) => {
 
 app.use(
   "/graphql",
-  graphqlHttp({
+  graphqlHttp((req, res) => ({
     schema: graphqlSchema,
     rootValue: graphqlResolvers,
+    context: { req, res },
     graphiql: true
-  })
+  }))
 );
 
 mongoose
