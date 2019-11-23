@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -5,7 +6,7 @@ const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./Graphql/Schemas/Mainschema");
 const graphqlResolvers = require("./Graphql/Resolvers/Mainresolver");
 const path = require("path");
-require("dotenv").config();
+
 const cors = require("cors");
 
 const app = express();

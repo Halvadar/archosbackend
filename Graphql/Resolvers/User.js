@@ -39,15 +39,15 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
+
     let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
       expiresIn: 1
     });
     res.cookie("token", token, { httponly: true });
 
-    console.log("oassed");
-    return { ...newuser, token };
+    return { ...newuser._doc, token };
   },
-  createGmailUser: async args => {
+  createGmailUser: async (args, { req, res }) => {
     let errors;
     let newuser;
     errors = await uservalidator.createGmailUserValidator({ ...args.Input });
@@ -62,7 +62,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-    console.log("oassed");
-    return newuser;
+    let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
+      expiresIn: 1
+    });
+    res.cookie("token", token, { httponly: true });
+
+    return { ...newuser._doc, token };
   }
 };

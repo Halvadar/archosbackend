@@ -1,7 +1,7 @@
 const validator = require("validator");
 const { user, facebookuser, gmailuser } = require("../Models/Users");
 const fetch = require("node-fetch");
-const request = require("request");
+const axios = require("axios");
 
 module.exports = {
   createUserValidator: async args => {
@@ -46,15 +46,11 @@ module.exports = {
     let email;
     let id;
 
-    id = await request(
-      `https://graph.facebook.com/me?access_token=${args.token}`,
-      { json: true },
-      (err, res, body) => {
-        if (!err) {
-          return body.id;
-        }
-      }
-    );
+    id = await axios({
+      url: `https://graph.facebook.com/me?access_token=${args.token}`
+    }).then(result => {
+      return result.data.id;
+    });
     if (id !== args.facebookid) {
       console.log(id, args.facebookid);
       errors.push("Given Facebook Id is invalid");
@@ -105,10 +101,21 @@ module.exports = {
     return;
   },
   createGmailUserValidator: async args => {
+    console.log("passed");
     let errors = [];
     let username;
     let email;
     let id;
+    id = await axios({
+      url: `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${args.token}`
+    })
+      .then(result => {
+        console.log(result);
+        return result.data.user_id;
+      })
+      .catch(err => {
+        console.log(err);
+      });
 
     await Promise.all([
       gmailuser.findOne({ username: args.username }),
