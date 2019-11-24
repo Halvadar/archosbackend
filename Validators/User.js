@@ -7,10 +7,10 @@ module.exports = {
   createUserValidator: async args => {
     console.log(args);
     let errors = [];
-    username = await user.find({ username: args.username });
-    email = await user.find({ email: args.email });
+    username = await user.findOne({ username: args.username });
+    email = await user.findOne({ email: args.email });
 
-    if (username) {
+    if (username !== null) {
       errors.push("Username already taken");
     }
 
@@ -18,7 +18,7 @@ module.exports = {
       errors.push("Email is not valid");
     }
 
-    if (email) {
+    if (email !== null) {
       errors.push("Email already taken");
     }
     if (args.password !== args.repassword) {

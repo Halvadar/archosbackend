@@ -2,9 +2,10 @@ const { user, facebookuser, gmailuser } = require("../../Models/Users");
 const validator = require("validator");
 const uservalidator = require("../../Validators/User");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 module.exports = {
-  createUser: async args => {
+  createUser: async (args, { req, res }) => {
     let errors;
     let newuser;
     console.log("asdasd");
@@ -19,17 +20,17 @@ module.exports = {
       });
       await newuser.save();
     } catch (error) {
-      console.log(error);
+      throw new Error("Database Error");
     }
-    console.log(newuser);
-    return newuser;
-  },
-  createFacebookUser: async (args, { req, res }) => {
-    let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
+    let token = jwt.sign({ id: newuser.id }, process.env.APP_SECRET, {
       expiresIn: "1h"
     });
 
-    res.cookie("access_token", "Bear", { expiresIn: "1h" });
+    res.cookie("access_token", token, { httponly: true });
+    console.log();
+    return { ...newuser._doc, usertype: "archos" };
+  },
+  createFacebookUser: async (args, { req, res }) => {
     console.log("aaaaaaaaa", res.cookie);
     let errors;
     let newuser;
@@ -43,10 +44,15 @@ module.exports = {
       });
       await newuser.save();
     } catch (error) {
-      throw new Error("server error");
+      throw new Error("Database Error");
     }
+    let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
+      expiresIn: "1h"
+    });
 
-    return { ...newuser._doc, token };
+    res.cookie("access_token", token, { httponly: true });
+
+    return { ...newuser._doc, usertype: "facebook" };
   },
   createGmailUser: async (args, { req, res }) => {
     let errors;
@@ -61,13 +67,13 @@ module.exports = {
       });
       await newuser.save();
     } catch (error) {
-      console.log(error);
+      throw new Error("Database Error");
     }
-    let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
+    let token = jwt.sign({ id: args.gmailid }, process.env.APP_SECRET, {
       expiresIn: "1h"
     });
     res.cookie("acccess_token", token, { httponly: true });
 
-    return { ...newuser._doc, token };
+    return { ...newuser._doc, usertype: "gmail" };
   }
 };

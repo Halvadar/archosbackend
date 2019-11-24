@@ -52,7 +52,8 @@ module.exports = buildSchema(`
     type User {
         name:String!
         username:String!
-        token:String!
+        lastname:String
+        usertype:String!
     }
     type RootQuery {
         getCards(Input:GetCardInput):[Card!]
