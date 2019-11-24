@@ -25,6 +25,12 @@ module.exports = {
     return newuser;
   },
   createFacebookUser: async (args, { req, res }) => {
+    let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
+      expiresIn: "1h"
+    });
+
+    res.cookie("access_token", "Bear", { expiresIn: "1h" });
+    console.log("aaaaaaaaa", res.cookie);
     let errors;
     let newuser;
     errors = await uservalidator.createFacebookUserValidator({ ...args.Input });
@@ -37,13 +43,8 @@ module.exports = {
       });
       await newuser.save();
     } catch (error) {
-      console.log(error);
+      throw new Error("server error");
     }
-
-    let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
-      expiresIn: 1
-    });
-    res.cookie("token", token, { httponly: true });
 
     return { ...newuser._doc, token };
   },
@@ -63,9 +64,9 @@ module.exports = {
       console.log(error);
     }
     let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
-      expiresIn: 1
+      expiresIn: "1h"
     });
-    res.cookie("token", token, { httponly: true });
+    res.cookie("acccess_token", token, { httponly: true });
 
     return { ...newuser._doc, token };
   }

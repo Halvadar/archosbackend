@@ -48,9 +48,13 @@ module.exports = {
 
     id = await axios({
       url: `https://graph.facebook.com/me?access_token=${args.token}`
-    }).then(result => {
-      return result.data.id;
-    });
+    })
+      .then(result => {
+        return result.data.id;
+      })
+      .catch(err => {
+        console.log(1);
+      });
     if (id !== args.facebookid) {
       console.log(id, args.facebookid);
       errors.push("Given Facebook Id is invalid");
@@ -75,9 +79,7 @@ module.exports = {
           }
         });
       })
-      .catch(err => {
-        console.log(err);
-      });
+      .catch(err => {});
 
     email = await facebookuser.findOne({ email: args.email });
 

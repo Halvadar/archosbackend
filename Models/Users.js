@@ -15,14 +15,14 @@ const facebookuser = new Schema({
   lastname: { required: true, type: String },
   username: { required: true, type: String },
   email: { required: true, type: String },
-  facebookid: { required: true, type: Number }
+  facebookid: { required: true, type: String }
 });
 const gmailuser = new Schema({
   name: { required: true, type: String },
   lastname: { required: true, type: String },
   username: { required: true, type: String },
   email: { required: true, type: String },
-  gmailid: { required: true, type: Number }
+  gmailid: { required: true, type: String }
 });
 
 module.exports = {
