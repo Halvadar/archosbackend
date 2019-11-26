@@ -1,5 +1,5 @@
 const { user, facebookuser, gmailuser } = require("../../Models/Users");
-const validator = require("validator");
+
 const uservalidator = require("../../Validators/User");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -46,9 +46,13 @@ module.exports = {
     } catch (error) {
       throw new Error("Database Error");
     }
-    let token = jwt.sign({ id: args.facebookid }, process.env.APP_SECRET, {
-      expiresIn: "1h"
-    });
+    let token = jwt.sign(
+      { id: args.Input.facebookid },
+      process.env.APP_SECRET,
+      {
+        expiresIn: "1d"
+      }
+    );
 
     res.cookie("access_token", token, { httponly: true });
 
@@ -69,11 +73,61 @@ module.exports = {
     } catch (error) {
       throw new Error("Database Error");
     }
-    let token = jwt.sign({ id: args.gmailid }, process.env.APP_SECRET, {
-      expiresIn: "1h"
+    let token = jwt.sign({ id: args.Input.gmailid }, process.env.APP_SECRET, {
+      expiresIn: "1d"
     });
     res.cookie("acccess_token", token, { httponly: true });
 
     return { ...newuser._doc, usertype: "gmail" };
+  },
+  loginFacebook: async (args, { req, res }) => {
+    let {
+      existingfacebookuser,
+      errors
+    } = await uservalidator.loginFacebookUserValidator(args.Input);
+
+    if (errors.length > 0) {
+      throw new Error(errors);
+    }
+
+    let token = jwt.sign({ id: args.Input.id }, process.env.APP_SECRET, {
+      expiresIn: "1d"
+    });
+    res.cookie("token", token, { expiresIn: "1d" });
+
+    return { ...existingfacebookuser._doc, usertype: "facebook" };
+  },
+  loginGoogle: async (args, { req, res }) => {
+    let {
+      existinggmailuser,
+      errors
+    } = await uservalidator.loginGmailUserValidator(args.Input);
+
+    if (errors.length > 0) {
+      throw new Error(errors);
+    }
+
+    let token = jwt.sign({ id: args.Input.id }, process.env.APP_SECRET, {
+      expiresIn: "1d"
+    });
+    res.cookie("token", token, { expiresIn: "1d" });
+
+    return { ...existinggmailuser._doc, usertype: "gmail" };
+  },
+  loginArchos: async (args, { req, res }) => {
+    let { existinguser, errors } = await uservalidator.loginArchosUserValidator(
+      args.Input
+    );
+    if (errors.length > 0) {
+      throw new Error(errors);
+    }
+
+    let token = jwt.sign({ id: existinguser.id }, process.env.APP_SECRET, {
+      expiresIn: "1d"
+    });
+
+    res.cookie("token", token, { expiresIn: "1d" });
+    console.log(token);
+    return { ...existinguser._doc, usertype: "archos" };
   }
 };

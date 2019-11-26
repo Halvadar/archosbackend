@@ -55,8 +55,19 @@ module.exports = buildSchema(`
         lastname:String
         usertype:String!
     }
+    input FacebookGoogleLoginType {
+        token:String!
+        id:String!
+    }
+    input ArchosUserType {
+        email:String!
+        password:String!
+    }
     type RootQuery {
         getCards(Input:GetCardInput):[Card!]
+        loginFacebook(Input:FacebookGoogleLoginType):User!
+        loginGoogle(Input:FacebookGoogleLoginType):User!
+        loginArchos(Input:ArchosUserType):User!
     }
     type RootMutation {
         createCard(cardInput:CardInput):Card
