@@ -5,6 +5,15 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 module.exports = {
+  logoutUser: (args, { req, res }) => {
+    res.clearCookie("token");
+    return {
+      name: undefined,
+      username: undefined,
+      lastname: undefined,
+      usertype: undefined
+    };
+  },
   createUser: async (args, { req, res }) => {
     let errors;
     let newuser;
@@ -26,7 +35,7 @@ module.exports = {
       expiresIn: "1h"
     });
 
-    res.cookie("access_token", token, { httponly: true });
+    res.cookie("access_token", token, { httpOnly: true });
     console.log();
     return { ...newuser._doc, usertype: "archos" };
   },
@@ -54,7 +63,7 @@ module.exports = {
       }
     );
 
-    res.cookie("access_token", token, { httponly: true });
+    res.cookie("access_token", token, { httpOnly: true });
 
     return { ...newuser._doc, usertype: "facebook" };
   },
@@ -76,7 +85,7 @@ module.exports = {
     let token = jwt.sign({ id: args.Input.gmailid }, process.env.APP_SECRET, {
       expiresIn: "1d"
     });
-    res.cookie("acccess_token", token, { httponly: true });
+    res.cookie("acccess_token", token, { httpOnly: true });
 
     return { ...newuser._doc, usertype: "gmail" };
   },
@@ -93,9 +102,13 @@ module.exports = {
     let token = jwt.sign({ id: args.Input.id }, process.env.APP_SECRET, {
       expiresIn: "1d"
     });
-    res.cookie("token", token, { expiresIn: "1d" });
+    res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
 
-    return { ...existingfacebookuser._doc, usertype: "facebook" };
+    return {
+      ...existingfacebookuser._doc,
+      usertype: "facebook",
+      httponly: true
+    };
   },
   loginGoogle: async (args, { req, res }) => {
     let {
@@ -110,7 +123,7 @@ module.exports = {
     let token = jwt.sign({ id: args.Input.id }, process.env.APP_SECRET, {
       expiresIn: "1d"
     });
-    res.cookie("token", token, { expiresIn: "1d" });
+    res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
 
     return { ...existinggmailuser._doc, usertype: "gmail" };
   },
@@ -126,7 +139,7 @@ module.exports = {
       expiresIn: "1d"
     });
 
-    res.cookie("token", token, { expiresIn: "1d" });
+    res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
     console.log(token);
     return { ...existinguser._doc, usertype: "archos" };
   }

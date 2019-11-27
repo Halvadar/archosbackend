@@ -50,10 +50,10 @@ module.exports = buildSchema(`
         gmailid:String!
     }
     type User {
-        name:String!
-        username:String!
+        name:String
+        username:String
         lastname:String
-        usertype:String!
+        usertype:String
     }
     input FacebookGoogleLoginType {
         token:String!
@@ -75,6 +75,7 @@ module.exports = buildSchema(`
         createUser(Input:UserInput!):User
         createFacebookUser(Input:UserInputFacebook!):User
         createGmailUser(Input:UserInputGmail!):User
+        logoutUser(Input:Boolean):User
     }
     schema{
         query:RootQuery

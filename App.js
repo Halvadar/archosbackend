@@ -6,6 +6,25 @@ const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./Graphql/Schemas/Mainschema");
 const graphqlResolvers = require("./Graphql/Resolvers/Mainresolver");
 const path = require("path");
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: "Images",
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    console.log(file.mimetype === "image/jpeg");
+    if (file.mimetype === "image/png" || "image/jpeg") {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type"));
+    }
+  }
+});
 
 const cors = require("cors");
 
@@ -18,6 +37,11 @@ app.use(
 );
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.post("/uploadimage", upload.single("image"), (req, res, next) => {
+  console.log(req);
+  res.send({ asd: "hola" });
+});
 app.use((req, res, next) => {
   console.log("asdasd", req.body);
   next();
