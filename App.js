@@ -6,29 +6,19 @@ const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./Graphql/Schemas/Mainschema");
 const graphqlResolvers = require("./Graphql/Resolvers/Mainresolver");
 const path = require("path");
-const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: "Images",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
-
-const upload = multer({
-  storage: storage,
-  fileFilter: (req, file, cb) => {
-    console.log(file.mimetype === "image/jpeg");
-    if (file.mimetype === "image/png" || "image/jpeg") {
-      cb(null, true);
-    } else {
-      cb(new Error("Invalid file type"));
-    }
-  }
-});
-
+const cookieparser = require("cookie-parser");
 const cors = require("cors");
+const cards = require("./Models/Cards");
+const upload = require("./Multer/Multer");
+const jwt = require("jsonwebtoken");
+const { user, facebookuser, gmailuser } = require("./Models/Users");
 
 const app = express();
+
+app.use(bodyParser.json());
+app.use(cookieparser());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(
   cors({
     credentials: true,
@@ -36,11 +26,53 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.post("/uploadimage", upload.single("image"), (req, res, next) => {
-  console.log(req);
-  res.send({ asd: "hola" });
+app.get("/checklogin", async (req, res, next) => {
+  jwt.verify(
+    req.cookies.token,
+    process.env.APP_SECRET,
+    async (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return null;
+      }
+      console.log(decoded);
+      let founduser;
+      if (decoded.usertype === "archos") {
+        founduser = await user.findById(decoded.id);
+      } else if (decoded.usertype === "facebook") {
+        founduser = await facebookuser.findById(decoded.id);
+        console.log("found");
+      } else {
+        founduser = await gmailuser.findById(decoded.id);
+      }
+
+      res.send({
+        usertype: "facebook",
+        name: founduser.name,
+        username: founduser.username,
+        lastname: founduser.lastname
+      });
+    }
+  );
+});
+
+app.post("/uploadimage", upload.single("image"), async (req, res, next) => {
+  try {
+    await cards
+      .findById(req.body._id)
+      .exec()
+      .then(result => {
+        console.log(result);
+        result.set(
+          "image",
+          process.env.BACKEND + `/images/${req.file.filename}`
+        );
+        result.save();
+      });
+  } catch (err) {
+    throw new Error("Server error");
+  }
+  res.send(true);
 });
 app.use((req, res, next) => {
   console.log("asdasd", req.body);
@@ -49,7 +81,7 @@ app.use((req, res, next) => {
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Origin", process.env.ORIGIN);
   res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") {

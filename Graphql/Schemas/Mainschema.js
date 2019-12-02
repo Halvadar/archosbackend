@@ -3,6 +3,7 @@ const { buildSchema } = require("graphql");
 module.exports = buildSchema(`
     type Card {
         _id:ID!
+        createdby:ID!
         title:String!
         description:String!
         image:String!
@@ -14,7 +15,7 @@ module.exports = buildSchema(`
     input CardInput {
         title:String!
         description:String!
-        image:String!
+        imageurl:String
         category:String!
         subcategory:String
     }
@@ -63,19 +64,26 @@ module.exports = buildSchema(`
         email:String!
         password:String!
     }
+    type ok {
+        result:Boolean!
+    }
     type RootQuery {
         getCards(Input:GetCardInput):[Card!]
         loginFacebook(Input:FacebookGoogleLoginType):User!
         loginGoogle(Input:FacebookGoogleLoginType):User!
         loginArchos(Input:ArchosUserType):User!
+        getPostedCards:[Card!]
     }
+    
     type RootMutation {
-        createCard(cardInput:CardInput):Card
-        deleteCard(deleteId:ID!):Card!
+        createCard(Input:CardInput!):Card!
+        deleteCard(deleteId:ID!):Boolean!
         createUser(Input:UserInput!):User
         createFacebookUser(Input:UserInputFacebook!):User
         createGmailUser(Input:UserInputGmail!):User
         logoutUser(Input:Boolean):User
+        deleteUser(email:String!):ok
+        deleteUserConfirmation(token:String!):ok
     }
     schema{
         query:RootQuery
