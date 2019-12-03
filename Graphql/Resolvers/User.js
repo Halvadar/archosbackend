@@ -248,15 +248,110 @@ module.exports = {
       }
     );
     let founduser;
-    let foundcards;
+    await cards.deleteMany({ created: decoded.id });
+    await cards.save();
+
     if (decoded.usertype === "facebook") {
       founduser = await facebookuser.findById(decoded.id);
+      await facebookuser.findByIdAndDelete(decoded.id);
+      await facebookuser.save();
     } else if (decoded.usertype === "gmail") {
       founduser = await gmailuser.findById(decoded.id);
+      await gmailuser.findOneAndDelete(decoded.id);
+      await gmailuser.save();
+    } else {
+      founduser = await user.findById(decoded.id);
+      await user.findByIdAndDelete(decoded.id);
+      await user.save();
+    }
+    return true;
+  },
+  changePassword: async () => {
+    let decoded;
+    await jwt.verify(
+      req.cookies.token,
+      process.env.APP_SECRET,
+      (err, decode) => {
+        if (err) {
+          throw new Error("You need to be logged in to make this request");
+        }
+        decoded = decode;
+      }
+    );
+    let founduser;
+
+    if (decoded.usertype === "facebook") {
+      throw new Error("You cant change password on facebook user");
+    } else if (decoded.usertype === "gmail") {
+      throw new Error("You cant change password on gmail user");
     } else {
       founduser = await user.findById(decoded.id);
     }
-    await cards.deleteMany({ created: founduser.id });
-    await cards.save();
+    if (args.email !== founduser.email) {
+      throw new Error("Provided email address is not valid for this Account");
+    }
+    const jwtargs = [
+      { id: founduser.id, usertype: founduser.usertype },
+      { expiresIn: "10m" }
+    ];
+    console.log(founduser.email);
+    transporter.sendMail(
+      {
+        to: founduser.email,
+        from: "Archos@verification.com",
+        subject: "Email Verification code",
+        html: `<h1>This will expire in 10 minutes - ${jwt.sign(
+          jwtargs[0],
+          process.env.APP_SECRET,
+          jwtargs[1]
+        )}</h1>`
+      },
+      (err, info) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(info);
+      }
+    );
+    console.log("asdasd");
+
+    return { result: true };
+  },
+  changePasswordConfirmation: async args => {
+    let decodedchangepswtoken;
+    let decodedusertoken;
+    await jwt.verify(
+      args.changepswtoken,
+      process.env.APP_SECRET,
+      (err, decodedtoken) => {
+        if (err) {
+          throw new Error(
+            "Provided token is incorrect. The token might have expired.  "
+          );
+        }
+        decodedchangepswtoken = decodedtoken;
+      }
+    );
+    await jwt.verify(
+      req.cookies.token,
+      process.env.APP_SECRET,
+      (err, decoded) => {
+        if (err) {
+          throw new Error("You are not logged in");
+        }
+        decodedusertoken = decoded;
+      }
+    );
+    let founduser;
+    if (decodedusertoken.usertype === "facebook") {
+      throw new Error("You cant change password on facebook user");
+    } else if (decodedusertoken.usertype === "gmail") {
+      throw new Error("You cant change password on gmail user");
+    } else {
+      founduser = await user.findById(decodedusertoken.id);
+    }
+    await founduser.set({ email: args.changeemail });
+    await founduser.save();
+    return true;
   }
 };

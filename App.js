@@ -38,20 +38,32 @@ app.get("/checklogin", async (req, res, next) => {
       console.log(decoded);
       let founduser;
       if (decoded.usertype === "archos") {
+        console.log("archos");
         founduser = await user.findById(decoded.id);
+        res.send({
+          usertype: "archos",
+          name: founduser.name,
+          username: founduser.username,
+          lastname: founduser.lastname
+        });
       } else if (decoded.usertype === "facebook") {
         founduser = await facebookuser.findById(decoded.id);
+        res.send({
+          usertype: "facebook",
+          name: founduser.name,
+          username: founduser.username,
+          lastname: founduser.lastname
+        });
         console.log("found");
       } else {
         founduser = await gmailuser.findById(decoded.id);
+        res.send({
+          usertype: "gmail",
+          name: founduser.name,
+          username: founduser.username,
+          lastname: founduser.lastname
+        });
       }
-
-      res.send({
-        usertype: "facebook",
-        name: founduser.name,
-        username: founduser.username,
-        lastname: founduser.lastname
-      });
     }
   );
 });

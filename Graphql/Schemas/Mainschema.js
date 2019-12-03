@@ -84,6 +84,8 @@ module.exports = buildSchema(`
         logoutUser(Input:Boolean):User
         deleteUser(email:String!):ok
         deleteUserConfirmation(token:String!):ok
+        changePassword(email:String!,password:String!):ok
+        changePasswordConfirmation(token:String!,changeemail:String!):ok
     }
     schema{
         query:RootQuery
