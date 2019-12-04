@@ -205,9 +205,23 @@ module.exports = {
     } else {
       founduser = await user.findById(decoded.id);
     }
-    if (args.email !== founduser.email) {
-      throw new Error("Provided email address is not valid for this Account");
+    if (decoded.usertype === "facebook") {
+      if (founduser.email !== args.email) {
+        throw new Error("Email is incorrect for this account");
+      }
+    } else if (decoded.usertype === "gmail") {
+      if (founduser.email !== args.email) {
+        throw new Error("Email is incorrect for this account");
+      }
+    } else {
+      if (founduser.email !== args.email) {
+        throw new Error("Email is incorrect for this account");
+      }
+      if (founduser.password !== args.email) {
+        throw new Error("Password doesnt match");
+      }
     }
+
     const jwtargs = [
       { id: founduser.id, usertype: founduser.usertype },
       { expiresIn: "10m" }
@@ -235,7 +249,7 @@ module.exports = {
 
     return { result: true };
   },
-  deleteUserConfirmation: async args => {
+  deleteUserConfirmation: async (args, { req, res }) => {
     let decoded;
     jwt.verify(
       args.deletetoken,
@@ -266,7 +280,8 @@ module.exports = {
     }
     return true;
   },
-  changePassword: async () => {
+  changePassword: async (args, { req, res }) => {
+    console.log(args);
     let decoded;
     await jwt.verify(
       req.cookies.token,
@@ -317,11 +332,12 @@ module.exports = {
 
     return { result: true };
   },
-  changePasswordConfirmation: async args => {
+  changePasswordConfirmation: async (args, { req, res }) => {
+    console.log(args.token);
     let decodedchangepswtoken;
     let decodedusertoken;
     await jwt.verify(
-      args.changepswtoken,
+      args.token,
       process.env.APP_SECRET,
       (err, decodedtoken) => {
         if (err) {
@@ -352,6 +368,6 @@ module.exports = {
     }
     await founduser.set({ email: args.changeemail });
     await founduser.save();
-    return true;
+    return { result: true };
   }
 };

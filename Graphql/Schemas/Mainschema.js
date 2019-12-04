@@ -82,9 +82,9 @@ module.exports = buildSchema(`
         createFacebookUser(Input:UserInputFacebook!):User
         createGmailUser(Input:UserInputGmail!):User
         logoutUser(Input:Boolean):User
-        deleteUser(email:String!):ok
+        deleteUser(email:String!,password:String):ok
         deleteUserConfirmation(token:String!):ok
-        changePassword(email:String!,password:String!):ok
+        changePassword(email:String!):ok
         changePasswordConfirmation(token:String!,changeemail:String!):ok
     }
     schema{
