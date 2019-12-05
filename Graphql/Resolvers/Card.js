@@ -61,5 +61,14 @@ module.exports = {
   deleteCard: async args => {
     const deletedCard = await card.deleteOne({ _id: args.deleteId });
     return deletedCard;
+  },
+  getCard: async args => {
+    let foundcard;
+    try {
+      foundcard = await card.findById(args.id);
+    } catch {
+      throw new Error("Card could not be found");
+    }
+    return { ...foundcard._doc };
   }
 };

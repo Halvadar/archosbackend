@@ -68,6 +68,7 @@ module.exports = buildSchema(`
         result:Boolean!
     }
     type RootQuery {
+        getCard(id:String!):Card
         getCards(Input:GetCardInput):[Card!]
         loginFacebook(Input:FacebookGoogleLoginType):User!
         loginGoogle(Input:FacebookGoogleLoginType):User!

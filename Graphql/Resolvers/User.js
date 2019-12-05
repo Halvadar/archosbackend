@@ -80,7 +80,7 @@ module.exports = {
       }
     );
 
-    res.cookie("access_token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true });
 
     return { ...newuser._doc, usertype: "facebook" };
   },
@@ -106,7 +106,7 @@ module.exports = {
         expiresIn: "1d"
       }
     );
-    res.cookie("acccess_token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true });
 
     return { ...newuser._doc, usertype: "gmail" };
   },
@@ -197,6 +197,7 @@ module.exports = {
       }
     );
     let founduser;
+    console.log(args);
 
     if (decoded.usertype === "facebook") {
       founduser = await facebookuser.findById(decoded.id);
@@ -223,7 +224,7 @@ module.exports = {
     }
 
     const jwtargs = [
-      { id: founduser.id, usertype: founduser.usertype },
+      { id: founduser.id, usertype: decoded.usertype },
       { expiresIn: "10m" }
     ];
     console.log(founduser.email);
@@ -250,9 +251,10 @@ module.exports = {
     return { result: true };
   },
   deleteUserConfirmation: async (args, { req, res }) => {
+    console.log("aaa");
     let decoded;
-    jwt.verify(
-      args.deletetoken,
+    await jwt.verify(
+      args.token,
       process.env.APP_SECRET,
       (err, decodedtoken) => {
         if (err) {
@@ -262,23 +264,21 @@ module.exports = {
       }
     );
     let founduser;
-    await cards.deleteMany({ created: decoded.id });
-    await cards.save();
-
+    console.log(decoded);
+    await cards.deleteMany({ createdby: decoded.id });
+    console.log(decoded);
     if (decoded.usertype === "facebook") {
+      console.log("found");
       founduser = await facebookuser.findById(decoded.id);
       await facebookuser.findByIdAndDelete(decoded.id);
-      await facebookuser.save();
     } else if (decoded.usertype === "gmail") {
       founduser = await gmailuser.findById(decoded.id);
       await gmailuser.findOneAndDelete(decoded.id);
-      await gmailuser.save();
     } else {
       founduser = await user.findById(decoded.id);
       await user.findByIdAndDelete(decoded.id);
-      await user.save();
     }
-    return true;
+    return { result: true };
   },
   changePassword: async (args, { req, res }) => {
     console.log(args);
@@ -306,7 +306,7 @@ module.exports = {
       throw new Error("Provided email address is not valid for this Account");
     }
     const jwtargs = [
-      { id: founduser.id, usertype: founduser.usertype },
+      { id: founduser.id, usertype: decoded.usertype },
       { expiresIn: "10m" }
     ];
     console.log(founduser.email);
