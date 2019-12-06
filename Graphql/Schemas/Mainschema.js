@@ -1,13 +1,17 @@
 const { buildSchema } = require("graphql");
 
 module.exports = buildSchema(`
+    type score {
+        ratedby:ID!
+        score:Int!
+    }
     type Card {
         _id:ID!
         createdby:ID!
         title:String!
         description:String!
         image:String!
-        score:[Int!]
+        score:[score!]
         category:String!
         subcategory:String!
     }
@@ -77,6 +81,7 @@ module.exports = buildSchema(`
     }
     
     type RootMutation {
+        rateCard(id:String!,score:Int!):Card!
         createCard(Input:CardInput!):Card!
         deleteCard(deleteId:ID!):Boolean!
         createUser(Input:UserInput!):User
