@@ -1,13 +1,19 @@
 const { buildSchema } = require("graphql");
 
 module.exports = buildSchema(`
+    type userInfoType{
+        _id:ID!
+        username:String!
+        name:String!
+        lastname:String!
+    }
     type score {
-        ratedby:ID!
+        ratedby:userInfoType!
         score:Int!
     }
     type Card {
         _id:ID!
-        createdby:ID!
+        createdby:userInfoType!
         title:String!
         description:String!
         image:String!

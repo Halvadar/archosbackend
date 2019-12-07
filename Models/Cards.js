@@ -7,11 +7,18 @@ const Cards = new Schema({
   image: { type: String },
   description: { required: true, type: String },
   score: [
-    { ratedby: { type: Schema.Types.ObjectId, ref: "usertype" }, score: Number }
+    {
+      ratedbyusertype: String,
+      ratedby: {
+        type: Schema.Types.ObjectId,
+        refPath: "score.ratedbyusertype"
+      },
+      score: Number
+    }
   ],
   category: { required: true, type: String },
   subcategory: { type: String },
-  createdby: { type: Schema.Types.ObjectId, ref: "usertype" },
+  createdby: { type: Schema.Types.ObjectId, refPath: "usertype" },
   usertype: { type: String, required: true }
 });
 

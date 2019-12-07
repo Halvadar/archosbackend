@@ -2,19 +2,17 @@ const card = require("../../Models/Cards");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
-const usersetter = function() {
-  console.log(this.a);
-  /* if (this.decoded.usertype === "facebook") {
+function usersetter(decoded) {
+  if (decoded.usertype === "facebook") {
     return "facebookuser";
-  } else if (this.decoded.usertype === "gmail") {
+  } else if (decoded.usertype === "gmail") {
     return "gmailuser";
   } else {
     return "user";
-  } */
-};
+  }
+}
 
 module.exports = {
-  a: 1,
   getCards: async (args, req) => {
     let cards;
     console.log("asdfff");
@@ -27,8 +25,6 @@ module.exports = {
     return cards;
   },
   createCard: async (args, { req, res }) => {
-    let a = 1;
-    let errors;
     let decoded;
     let newCard;
     await jwt.verify(
@@ -41,17 +37,17 @@ module.exports = {
         decoded = result;
       }
     );
-    usersetter();
+
     try {
       newCard = new card({
         ...args.Input,
         createdby: decoded.id,
-        usertype: usersetter()
+        usertype: usersetter(decoded)
       });
 
       await newCard.save();
     } catch (err) {
-      throw new Error(err);
+      throw new Error("Server Error");
     }
 
     return { ...newCard._doc };
@@ -79,15 +75,19 @@ module.exports = {
   getCard: async args => {
     let foundcard;
     try {
-      foundcard = await card.findById(args.id);
+      foundcard = await card
+        .findById(args.id)
+        .populate({ path: "createdby", select: "username name _id lastname" });
     } catch {
       throw new Error("Card could not be found");
     }
+    console.log(foundcard);
     return { ...foundcard._doc };
   },
   rateCard: async (args, { req, res }) => {
     let foundcard;
     let token;
+    let checkrated;
     await jwt.verify(
       req.cookies.token,
       process.env.APP_SECRET,
@@ -98,17 +98,37 @@ module.exports = {
         token = decoded;
       }
     );
-    foundcard = await card
-      .findById(args.id)
-      .populate("createdby")
-      .exec((err, res) => {
-        console.log(err, res);
+
+    try {
+      foundcard = await card.findById(args.id);
+      checkrated = await foundcard.score.find((rated, index) => {
+        if (rated.ratedby.toString() === token.id) {
+          rated.score = args.score;
+          return rated;
+        }
       });
 
-    console.log(foundcard);
+      if (checkrated === undefined) {
+        foundcard.score.push({
+          ratedbyusertype: usersetter(token),
+          ratedby: token.id,
+          score: args.score
+        });
+      }
 
-    foundcard.score.push({ ratedby: token.id, score: args.score });
-    foundcard.save();
+      await foundcard.save();
+
+      await foundcard
+        .populate({
+          path: "score.ratedby",
+          select: "name _id username lastname"
+        })
+        .execPopulate()
+        .then(res => {});
+    } catch (err) {
+      throw new Error("Server error");
+    }
+
     return { score: foundcard.score };
   }
 };
