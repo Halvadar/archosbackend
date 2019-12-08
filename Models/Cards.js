@@ -16,6 +16,17 @@ const Cards = new Schema({
       score: Number
     }
   ],
+  comments: [
+    {
+      commentedbyusertype: String,
+      commentedby: {
+        type: Schema.Types.ObjectId,
+        refPath: "comments.commentedbyusertype"
+      },
+      comment: String,
+      date: Date
+    }
+  ],
   category: { required: true, type: String },
   subcategory: { type: String },
   createdby: { type: Schema.Types.ObjectId, refPath: "usertype" },

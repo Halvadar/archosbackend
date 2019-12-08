@@ -11,6 +11,11 @@ module.exports = buildSchema(`
         ratedby:userInfoType!
         score:Int!
     }
+    type comment {
+        commentedby:userInfoType!
+        comment:String!
+        date:String!
+    }
     type Card {
         _id:ID!
         createdby:userInfoType!
@@ -20,6 +25,7 @@ module.exports = buildSchema(`
         score:[score!]
         category:String!
         subcategory:String!
+        comments:[comment!]
     }
   
     input CardInput {
@@ -87,6 +93,7 @@ module.exports = buildSchema(`
     }
     
     type RootMutation {
+        comment(id:String!,comment:String!):[comment!]
         rateCard(id:String!,score:Int!):Card!
         createCard(Input:CardInput!):Card!
         deleteCard(deleteId:ID!):Boolean!

@@ -77,7 +77,11 @@ module.exports = {
     try {
       foundcard = await card
         .findById(args.id)
-        .populate({ path: "createdby", select: "username name _id lastname" });
+        .populate({ path: "createdby", select: "username name _id lastname" })
+        .populate({
+          path: "comments.commentedby",
+          select: "username name _id lastname"
+        });
     } catch {
       throw new Error("Card could not be found");
     }
@@ -130,5 +134,41 @@ module.exports = {
     }
 
     return { score: foundcard.score };
+  },
+  comment: async (args, { req }) => {
+    let foundcard;
+    let token;
+
+    await jwt.verify(
+      req.cookies.token,
+      process.env.APP_SECRET,
+      async (err, decoded) => {
+        if (err) {
+          throw new Error("You need to be signed in to Comment");
+        }
+        token = decoded;
+      }
+    );
+    try {
+      foundcard = await card.findById(args.id);
+      foundcard.comments.push({
+        commentedbyusertype: usersetter(token),
+        commentedby: token.id,
+        comment: args.comment,
+        date: Date()
+      });
+      await foundcard.save();
+      await foundcard
+        .populate({
+          path: "comments.commentedby",
+
+          select: "name username _id lastname"
+        })
+        .execPopulate();
+    } catch (err) {
+      throw new Error("Server Error");
+    }
+
+    return foundcard.comments;
   }
 };
