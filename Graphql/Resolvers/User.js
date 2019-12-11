@@ -26,10 +26,10 @@ module.exports = {
   createUser: async (args, { req, res }) => {
     let errors;
     let newuser;
-    console.log("asdasd");
+
     errors = await uservalidator.createUserValidator({ ...args.Input });
+    console.log([...errors]);
     if (errors) {
-      console.log("error");
       throw new Error([...errors]);
     }
     try {
@@ -168,8 +168,9 @@ module.exports = {
     let { existinguser, errors } = await uservalidator.loginArchosUserValidator(
       args.Input
     );
+    console.log(errors);
     if (errors.length > 0) {
-      throw new Error(errors);
+      throw new Error([...errors]);
     }
 
     let token = jwt.sign(

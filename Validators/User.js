@@ -15,7 +15,6 @@ module.exports = {
       password = existinguser._doc.password;
     }
 
-    console.log("passed");
     if (password !== args.password) {
       errors.push("Password is incorrect");
     }
