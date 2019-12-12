@@ -28,9 +28,9 @@ module.exports = {
     let newuser;
 
     errors = await uservalidator.createUserValidator({ ...args.Input });
-    console.log([...errors]);
+
     if (errors) {
-      throw new Error([...errors]);
+      res.status(500).send(errors[0]);
     }
     try {
       newuser = await new user({
@@ -38,7 +38,7 @@ module.exports = {
       });
       await newuser.save();
     } catch (error) {
-      throw new Error("Database Error");
+      res.status(500).send("Database Error");
     }
     let token = jwt.sign(
       { id: newuser.id, usertype: "archos" },
@@ -58,7 +58,7 @@ module.exports = {
     let newuser;
     errors = await uservalidator.createFacebookUserValidator({ ...args.Input });
     if (errors) {
-      throw new Error([...errors]);
+      res.status(500).send(errors[0]);
     }
     try {
       newuser = await new facebookuser({
@@ -66,7 +66,7 @@ module.exports = {
       });
       await newuser.save();
     } catch (error) {
-      throw new Error("Database Error");
+      res.status(500).send("Database Error");
     }
     let token = jwt.sign(
       {
@@ -89,7 +89,7 @@ module.exports = {
     let newuser;
     errors = await uservalidator.createGmailUserValidator({ ...args.Input });
     if (errors) {
-      throw new Error([...errors]);
+      res.status(500).send(errors[0]);
     }
     try {
       newuser = await new gmailuser({
@@ -97,7 +97,7 @@ module.exports = {
       });
       await newuser.save();
     } catch (error) {
-      throw new Error("Database Error");
+      res.status(500).send("Database Error");
     }
     let token = jwt.sign(
       { gmailid: args.Input.gmailid, id: newuser.id, usertype: "gmail" },
@@ -117,7 +117,7 @@ module.exports = {
     } = await uservalidator.loginFacebookUserValidator(args.Input);
 
     if (errors.length > 0) {
-      throw new Error(errors);
+      res.status(500).send(errors[0]);
     }
     const foundfacebookuser = await facebookuser.findOne({
       facebookid: args.Input.id
@@ -149,7 +149,7 @@ module.exports = {
     } = await uservalidator.loginGmailUserValidator(args.Input);
 
     if (errors.length > 0) {
-      throw new Error(errors);
+      res.status(500).send(errors[0]);
     }
     const foundgmailuser = await gmailuser.findOne({ gmailid: args.Input.id });
 
@@ -168,9 +168,9 @@ module.exports = {
     let { existinguser, errors } = await uservalidator.loginArchosUserValidator(
       args.Input
     );
-    console.log(errors);
+
     if (errors.length > 0) {
-      throw new Error([...errors]);
+      res.status(500).send(errors[0]);
     }
 
     let token = jwt.sign(
@@ -192,7 +192,7 @@ module.exports = {
       process.env.APP_SECRET,
       (err, decode) => {
         if (err) {
-          throw new Error("You need to be logged in to make this request");
+          res.status(500).send("You need to be logged in to make this request");
         }
         decoded = decode;
       }
@@ -209,18 +209,18 @@ module.exports = {
     }
     if (decoded.usertype === "facebook") {
       if (founduser.email !== args.email) {
-        throw new Error("Email is incorrect for this account");
+        res.status(500).send("Email is incorrect for this account");
       }
     } else if (decoded.usertype === "gmail") {
       if (founduser.email !== args.email) {
-        throw new Error("Email is incorrect for this account");
+        res.status(500).send("Email is incorrect for this account");
       }
     } else {
       if (founduser.email !== args.email) {
-        throw new Error("Email is incorrect for this account");
+        res.status(500).send("Email is incorrect for this account");
       }
       if (founduser.password !== args.email) {
-        throw new Error("Password doesnt match");
+        res.status(500).send("Password doesnt match");
       }
     }
 
@@ -259,7 +259,7 @@ module.exports = {
       process.env.APP_SECRET,
       (err, decodedtoken) => {
         if (err) {
-          throw new Error("Provided token is not valid");
+          res.status(500).send("Provided token is not valid");
         }
         decoded = decodedtoken;
       }
@@ -289,7 +289,7 @@ module.exports = {
       process.env.APP_SECRET,
       (err, decode) => {
         if (err) {
-          throw new Error("You need to be logged in to make this request");
+          res.status(500).send("You need to be logged in to make this request");
         }
         decoded = decode;
       }
@@ -297,14 +297,16 @@ module.exports = {
     let founduser;
 
     if (decoded.usertype === "facebook") {
-      throw new Error("You cant change password on facebook user");
+      res.status(500).send("You cant change password on facebook user");
     } else if (decoded.usertype === "gmail") {
-      throw new Error("You cant change password on gmail user");
+      res.status(500).send("You cant change password on gmail user");
     } else {
       founduser = await user.findById(decoded.id);
     }
     if (args.email !== founduser.email) {
-      throw new Error("Provided email address is not valid for this Account");
+      res
+        .status(500)
+        .send("Provided email address is not valid for this Account");
     }
     const jwtargs = [
       { id: founduser.id, usertype: decoded.usertype },
@@ -342,9 +344,11 @@ module.exports = {
       process.env.APP_SECRET,
       (err, decodedtoken) => {
         if (err) {
-          throw new Error(
-            "Provided token is incorrect. The token might have expired.  "
-          );
+          res
+            .status(500)
+            .send(
+              "Provided token is incorrect. The token might have expired.  "
+            );
         }
         decodedchangepswtoken = decodedtoken;
       }
@@ -354,16 +358,16 @@ module.exports = {
       process.env.APP_SECRET,
       (err, decoded) => {
         if (err) {
-          throw new Error("You are not logged in");
+          res.status(500).send("You are not logged in");
         }
         decodedusertoken = decoded;
       }
     );
     let founduser;
     if (decodedusertoken.usertype === "facebook") {
-      throw new Error("You cant change password on facebook user");
+      res.status(500).send("You cant change password on facebook user");
     } else if (decodedusertoken.usertype === "gmail") {
-      throw new Error("You cant change password on gmail user");
+      res.status(500).send("You cant change password on gmail user");
     } else {
       founduser = await user.findById(decodedusertoken.id);
     }

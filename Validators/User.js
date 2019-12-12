@@ -209,7 +209,7 @@ module.exports = {
     }
 
     if (email !== null) {
-      errors.push("Email already taken");
+      errors.push("Account already exists with given Gmail Id. Try logging in");
     }
     if (args.gmailid) {
       let gmail;
