@@ -26,6 +26,8 @@ module.exports = buildSchema(`
         category:String!
         subcategory:String!
         comments:[comment!]
+        email:String
+        phone:Int
     }
   
     input CardInput {
@@ -34,6 +36,8 @@ module.exports = buildSchema(`
         imageurl:String
         category:String!
         subcategory:String
+        email:String
+        phone:Int
     }
     input GetCardInput {
         category:String

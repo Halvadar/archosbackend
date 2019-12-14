@@ -27,6 +27,8 @@ const Cards = new Schema({
       date: Date
     }
   ],
+  email: { type: String },
+  phone: { type: String },
   category: { required: true, type: String },
   subcategory: { type: String },
   createdby: { type: Schema.Types.ObjectId, refPath: "usertype" },
