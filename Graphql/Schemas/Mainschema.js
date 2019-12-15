@@ -21,7 +21,7 @@ module.exports = buildSchema(`
         createdby:userInfoType!
         title:String!
         description:String!
-        image:String!
+        image:String
         score:[score!]
         category:String!
         subcategory:String!

@@ -142,6 +142,7 @@ module.exports = {
       httponly: true
     };
   },
+  
   loginGoogle: async (args, { req, res }) => {
     let {
       existinggmailuser,
@@ -223,7 +224,7 @@ module.exports = {
         res.status(500).send("Password doesnt match");
       }
     }
-
+    
     const jwtargs = [
       { id: founduser.id, usertype: decoded.usertype },
       { expiresIn: "10m" }
