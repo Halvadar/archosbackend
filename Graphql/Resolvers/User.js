@@ -1,14 +1,16 @@
 const { user, facebookuser, gmailuser } = require("../../Models/Users");
 const nodemailer = require("nodemailer");
-const sendgridTransport = require("nodemailer-sendgrid-transport");
+
 const uservalidator = require("../../Validators/User");
 const jwt = require("jsonwebtoken");
 const cards = require("../../Models/Cards");
+const mg = require("nodemailer-mailgun-transport");
 
 const transporter = nodemailer.createTransport(
-  sendgridTransport({
+  mg({
     auth: {
-      api_key: process.env.EMAILAPIKEY
+      api_key: process.env.EMAILAPIKEY,
+      domain: "sandboxefa9601426bb4278b6f4ae9b5b95161c.mailgun.org"
     }
   })
 );
@@ -32,6 +34,7 @@ module.exports = {
     if (errors) {
       res.status(500).send(errors[0]);
     }
+
     try {
       newuser = await new user({
         ...args.Input
@@ -58,8 +61,13 @@ module.exports = {
     let newuser;
     errors = await uservalidator.createFacebookUserValidator({ ...args.Input });
     if (errors) {
-      res.status(500).send(errors[0]);
+      try {
+        res.status(500).send(errors[0]);
+      } catch (err) {
+        next(err);
+      }
     }
+    console.log("passed");
     try {
       newuser = await new facebookuser({
         ...args.Input
@@ -142,7 +150,7 @@ module.exports = {
       httponly: true
     };
   },
-  
+
   loginGoogle: async (args, { req, res }) => {
     let {
       existinggmailuser,
@@ -199,7 +207,6 @@ module.exports = {
       }
     );
     let founduser;
-    console.log(args);
 
     if (decoded.usertype === "facebook") {
       founduser = await facebookuser.findById(decoded.id);
@@ -220,11 +227,11 @@ module.exports = {
       if (founduser.email !== args.email) {
         res.status(500).send("Email is incorrect for this account");
       }
-      if (founduser.password !== args.email) {
+      if (founduser.password !== args.password) {
         res.status(500).send("Password doesnt match");
       }
     }
-    
+    console.log(founduser);
     const jwtargs = [
       { id: founduser.id, usertype: decoded.usertype },
       { expiresIn: "10m" }
@@ -338,6 +345,7 @@ module.exports = {
   },
   changePasswordConfirmation: async (args, { req, res }) => {
     console.log(args.token);
+    console.log(args);
     let decodedchangepswtoken;
     let decodedusertoken;
     await jwt.verify(
@@ -372,7 +380,7 @@ module.exports = {
     } else {
       founduser = await user.findById(decodedusertoken.id);
     }
-    await founduser.set({ email: args.changeemail });
+    await founduser.set({ password: args.changepassword });
     await founduser.save();
     return { result: true };
   }
