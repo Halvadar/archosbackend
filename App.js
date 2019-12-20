@@ -25,6 +25,20 @@ app.use(
     origin: process.env.ORIGIN
   })
 );
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", process.env.ORIGIN);
+  res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+app.use((req, res, next) => {
+  next();
+});
 
 app.get("/checklogin", async (req, res, next) => {
   jwt.verify(
@@ -86,31 +100,20 @@ app.post("/uploadimage", upload.single("image"), async (req, res, next) => {
   }
   res.send(true);
 });
-app.use((req, res, next) => {
-  console.log("asdasd", req.body);
-  next();
-});
-app.use("/images", express.static(path.join(__dirname, "images")));
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", process.env.ORIGIN);
-  res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
-app.use(
-  "/graphql",
-  graphqlHttp((req, res) => ({
+const graphqlfunc = graphqlHttp((req, res) => {
+  return {
     schema: graphqlSchema,
     rootValue: graphqlResolvers,
     context: { req, res },
     graphiql: true
-  }))
-);
+  };
+});
+app.use("/graphql", async (req, res, next) => {
+  console.log("asd");
+  try {
+    await graphqlfunc(req, res);
+  } catch (err) {}
+});
 
 mongoose
   .connect(
