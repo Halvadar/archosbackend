@@ -121,4 +121,4 @@ mongoose
     "mongodb+srv://Archos123:jldgnWgqRelkGcCl@archos-dqxu9.mongodb.net/Main?retryWrites=true&w=majority",
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
-  .then(() => app.listen(process.env.BACKEND));
+  .then(() => app.listen());
