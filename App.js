@@ -1,4 +1,3 @@
-console.log(process.env.S3_BUCKET, process.env.PORT);
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -122,3 +121,4 @@ mongoose
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => app.listen(process.env.PORT));
+console.log(process.env.S3_BUCKET, process.env.PORT);
