@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./Graphql/Schemas/Mainschema");
 const graphqlResolvers = require("./Graphql/Resolvers/Mainresolver");
-const aws = require("aws-sdk");
 const path = require("path");
 const cookieparser = require("cookie-parser");
 const cors = require("cors");
@@ -85,15 +84,13 @@ app.get("/checklogin", async (req, res, next) => {
 
 app.post("/uploadimage", upload.single("image"), async (req, res, next) => {
   try {
+    console.log(req.file);
     await cards
       .findById(req.body._id)
       .exec()
       .then(result => {
         console.log(result);
-        result.set(
-          "image",
-          process.env.BACKEND + `/images/${req.file.filename}`
-        );
+        result.set("image", req.file.location);
         result.save();
       });
   } catch (err) {
@@ -121,11 +118,4 @@ mongoose
     "mongodb+srv://Archos123:jldgnWgqRelkGcCl@archos-dqxu9.mongodb.net/Main?retryWrites=true&w=majority",
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
-  .then(() => app.listen(process.env.PORT));
-aws.config.getCredentials(err => {
-  if (err) {
-    console.log(err.stack);
-  } else {
-    console.log("Access key:", aws.config.credentials.accessKeyId);
-  }
-});
+  .then(() => app.listen(process.env.PORT || 4000));

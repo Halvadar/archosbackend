@@ -1,5 +1,13 @@
 const multer = require("multer");
 const jwt = require("jsonwebtoken");
+const multerS3 = require("multer-s3");
+const aws = require("aws-sdk");
+
+const s3Config = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  Bucket: process.env.S3_BUCKET_NAME
+});
 
 const storage = multer.diskStorage({
   destination: "Images",
@@ -19,9 +27,21 @@ const storage = multer.diskStorage({
     );
   }
 });
+const multerS3Config = multerS3({
+  s3: s3Config,
+  bucket: process.env.S3_BUCKET_NAME,
+  acl: "public-read",
+  metadata: function(req, file, cb) {
+    cb(null, { fieldName: file.fieldname });
+  },
+  key: function(req, file, cb) {
+    console.log(file);
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  }
+});
 
 const upload = multer({
-  storage: storage,
+  storage: multerS3Config,
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "image/png" || "image/jpeg") {
       cb(null, true);
