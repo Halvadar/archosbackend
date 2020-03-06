@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./Graphql/Schemas/Mainschema");
 const graphqlResolvers = require("./Graphql/Resolvers/Mainresolver");
+const aws = require("aws-sdk");
 const path = require("path");
 const cookieparser = require("cookie-parser");
 const cors = require("cors");
@@ -121,4 +122,10 @@ mongoose
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => app.listen(process.env.PORT));
-console.log(process.env.S3_BUCKET_NAME, process.env.PORT);
+aws.config.getCredentials(err => {
+  if (err) {
+    console.log(err.stack);
+  } else {
+    console.log("Access key:", aws.config.credentials.accessKeyId);
+  }
+});
