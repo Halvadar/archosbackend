@@ -1,4 +1,4 @@
-console.log(process.env.S3_BUCKET);
+console.log(process.env.S3_BUCKET, process.env.PORT);
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
