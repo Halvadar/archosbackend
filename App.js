@@ -121,4 +121,4 @@ mongoose
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => app.listen(process.env.PORT));
-console.log(process.env.S3_BUCKET, process.env.PORT);
+console.log(process.env.S3_BUCKET_NAME, process.env.PORT);
