@@ -6,7 +6,7 @@ const aws = require("aws-sdk");
 const s3Config = new aws.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  Bucket: process.env.S3_BUCKET_NAME
+  Bucket: process.env.S3_BUCKET_NAME,
 });
 
 const storage = multer.diskStorage({
@@ -25,19 +25,18 @@ const storage = multer.diskStorage({
         }
       }
     );
-  }
+  },
 });
 const multerS3Config = multerS3({
   s3: s3Config,
   bucket: process.env.S3_BUCKET_NAME,
   acl: "public-read",
-  metadata: function(req, file, cb) {
+  metadata: function (req, file, cb) {
     cb(null, { fieldName: file.fieldname });
   },
-  key: function(req, file, cb) {
-    console.log(file);
+  key: function (req, file, cb) {
     cb(null, new Date().toISOString() + "-" + file.originalname);
-  }
+  },
 });
 
 const upload = multer({
@@ -48,7 +47,7 @@ const upload = multer({
     } else {
       cb(new Error("Invalid file type"));
     }
-  }
+  },
 });
 
 module.exports = upload;

@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
     credentials: true,
-    origin: process.env.ORIGIN
+    origin: process.env.ORIGIN,
   })
 );
 app.use("/images", express.static(path.join(__dirname, "images")));
@@ -46,19 +46,16 @@ app.get("/checklogin", async (req, res, next) => {
     process.env.APP_SECRET,
     async (err, decoded) => {
       if (err) {
-        console.log(err);
         return null;
       }
-      console.log(decoded);
       let founduser;
       if (decoded.usertype === "archos") {
-        console.log("archos");
         founduser = await user.findById(decoded.id);
         res.send({
           usertype: "archos",
           name: founduser.name,
           username: founduser.username,
-          lastname: founduser.lastname
+          lastname: founduser.lastname,
         });
       } else if (decoded.usertype === "facebook") {
         founduser = await facebookuser.findById(decoded.id);
@@ -66,16 +63,15 @@ app.get("/checklogin", async (req, res, next) => {
           usertype: "facebook",
           name: founduser.name,
           username: founduser.username,
-          lastname: founduser.lastname
+          lastname: founduser.lastname,
         });
-        console.log("found");
       } else {
         founduser = await gmailuser.findById(decoded.id);
         res.send({
           usertype: "gmail",
           name: founduser.name,
           username: founduser.username,
-          lastname: founduser.lastname
+          lastname: founduser.lastname,
         });
       }
     }
@@ -84,12 +80,10 @@ app.get("/checklogin", async (req, res, next) => {
 
 app.post("/uploadimage", upload.single("image"), async (req, res, next) => {
   try {
-    console.log(req.file);
     await cards
       .findById(req.body._id)
       .exec()
-      .then(result => {
-        console.log(result);
+      .then((result) => {
         result.set("image", req.file.location);
         result.save();
       });
@@ -103,11 +97,10 @@ const graphqlfunc = graphqlHttp((req, res) => {
     schema: graphqlSchema,
     rootValue: graphqlResolvers,
     context: { req, res },
-    graphiql: true
+    graphiql: true,
   };
 });
 app.use("/graphql", async (req, res, next) => {
-  console.log("asd");
   try {
     await graphqlfunc(req, res);
   } catch (err) {}

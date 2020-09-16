@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 const axios = require("axios");
 
 module.exports = {
-  loginArchosUserValidator: async args => {
+  loginArchosUserValidator: async (args) => {
     let errors = [];
     let existinguser;
     let password;
@@ -20,18 +20,17 @@ module.exports = {
     }
     return { existinguser, errors };
   },
-  loginGmailUserValidator: async args => {
+  loginGmailUserValidator: async (args) => {
     let errors = [];
     let id;
     let existinggmailuser;
     id = await axios({
-      url: `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${args.token}`
+      url: `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${args.token}`,
     })
-      .then(result => {
-        console.log(result.data.user_id, args.id);
+      .then((result) => {
         return result.data.user_id;
       })
-      .catch(error => {});
+      .catch((error) => {});
 
     if (id !== args.id) {
       errors.push("Invalid Gmail ID");
@@ -46,17 +45,17 @@ module.exports = {
 
     return { existinggmailuser, errors };
   },
-  loginFacebookUserValidator: async args => {
+  loginFacebookUserValidator: async (args) => {
     let errors = [];
     let id;
     let existingfacebookuser;
     id = await axios({
-      url: `https://graph.facebook.com/me?access_token=${args.token}`
+      url: `https://graph.facebook.com/me?access_token=${args.token}`,
     })
-      .then(result => {
+      .then((result) => {
         return result.data.id;
       })
-      .catch(error => {});
+      .catch((error) => {});
 
     if (id !== args.id) {
       errors.push("Invalid Facebook ID");
@@ -71,8 +70,7 @@ module.exports = {
 
     return { existingfacebookuser, errors };
   },
-  createUserValidator: async args => {
-    console.log(args);
+  createUserValidator: async (args) => {
     let errors = [];
     username = await user.findOne({ username: args.username });
     email = await user.findOne({ email: args.email });
@@ -91,8 +89,6 @@ module.exports = {
     if (args.password !== args.repassword) {
       errors.push("Passwords don't match");
     }
-    console.log("face");
-
     if (args.gmailid) {
       let gmailid;
       gmailid = await user.find({ gmailid: args.gmailid });
@@ -100,33 +96,28 @@ module.exports = {
         errors.push("Account already exists with given Gmail Id");
       }
     }
-    console.log(errors);
     if (errors.length > 0) {
       return errors;
     }
 
     return;
   },
-  createFacebookUserValidator: async args => {
-    console.log(args);
+  createFacebookUserValidator: async (args) => {
     let errors = [];
     let email;
     let id;
 
     id = await axios({
-      url: `https://graph.facebook.com/me?access_token=${args.token}`
+      url: `https://graph.facebook.com/me?access_token=${args.token}`,
     })
-      .then(result => {
+      .then((result) => {
         return result.data.id;
       })
-      .catch(err => {
-        console.log(1);
-      });
+      .catch((err) => {});
     if (id !== args.facebookid) {
-      console.log(id, args.facebookid);
       errors.push("Given Facebook Id is invalid");
     }
-    await facebookuser.findOne({ facebookid: id }).then(result => {
+    await facebookuser.findOne({ facebookid: id }).then((result) => {
       if (result !== null) {
         errors.push(
           "Account already exists with Given Facebook Id, try logging in"
@@ -137,16 +128,16 @@ module.exports = {
     await Promise.all([
       facebookuser.findOne({ username: args.username }),
       user.findOne({ username: args.username }),
-      gmailuser.findOne({ username: args.username })
+      gmailuser.findOne({ username: args.username }),
     ])
-      .then(result => {
-        result.forEach(a => {
+      .then((result) => {
+        result.forEach((a) => {
           if (a !== null) {
             errors.push("Username already taken");
           }
         });
       })
-      .catch(err => {});
+      .catch((err) => {});
 
     email = await facebookuser.findOne({ email: args.email });
 
@@ -169,38 +160,32 @@ module.exports = {
     }
     return;
   },
-  createGmailUserValidator: async args => {
-    console.log("passed");
+  createGmailUserValidator: async (args) => {
     let errors = [];
     let username;
     let email;
     let id;
     id = await axios({
-      url: `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${args.token}`
+      url: `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${args.token}`,
     })
-      .then(result => {
-        console.log(result);
+      .then((result) => {
         return result.data.user_id;
       })
-      .catch(err => {
-        console.log(err);
-      });
+      .catch((err) => {});
 
     await Promise.all([
       gmailuser.findOne({ username: args.username }),
       user.findOne({ username: args.username }),
-      facebookuser.findOne({ username: args.username })
+      facebookuser.findOne({ username: args.username }),
     ])
-      .then(result => {
-        result.forEach(a => {
+      .then((result) => {
+        result.forEach((a) => {
           if (a !== null) {
             errors.push("Username already taken");
           }
         });
       })
-      .catch(err => {
-        console.log(err);
-      });
+      .catch((err) => {});
 
     email = await gmailuser.findOne({ email: args.email });
 
@@ -222,5 +207,5 @@ module.exports = {
       return errors;
     }
     return;
-  }
+  },
 };

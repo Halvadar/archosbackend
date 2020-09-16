@@ -15,10 +15,9 @@ function usersetter(decoded) {
 module.exports = {
   getCards: async (args, req) => {
     let cards;
-    console.log("asdfff");
     try {
       cards = await card.find({
-        ...args.Input
+        ...args.Input,
       });
     } catch (error) {}
 
@@ -42,7 +41,7 @@ module.exports = {
       newCard = new card({
         ...args.Input,
         createdby: decoded.id,
-        usertype: usersetter(decoded)
+        usertype: usersetter(decoded),
       });
 
       await newCard.save();
@@ -68,11 +67,11 @@ module.exports = {
 
     return foundcards;
   },
-  deleteCard: async args => {
+  deleteCard: async (args) => {
     const deletedCard = await card.deleteOne({ _id: args.deleteId });
     return deletedCard;
   },
-  getCard: async args => {
+  getCard: async (args) => {
     let foundcard;
     try {
       foundcard = await card
@@ -80,12 +79,11 @@ module.exports = {
         .populate({ path: "createdby", select: "username name _id lastname" })
         .populate({
           path: "comments.commentedby",
-          select: "username name _id lastname"
+          select: "username name _id lastname",
         });
     } catch {
       throw new Error("Card could not be found");
     }
-    console.log(foundcard);
     return { ...foundcard._doc };
   },
   rateCard: async (args, { req, res }) => {
@@ -116,7 +114,7 @@ module.exports = {
         foundcard.score.push({
           ratedbyusertype: usersetter(token),
           ratedby: token.id,
-          score: args.score
+          score: args.score,
         });
       }
 
@@ -125,10 +123,10 @@ module.exports = {
       await foundcard
         .populate({
           path: "score.ratedby",
-          select: "name _id username lastname"
+          select: "name _id username lastname",
         })
         .execPopulate()
-        .then(res => {});
+        .then((res) => {});
     } catch (err) {
       throw new Error("Server error");
     }
@@ -155,14 +153,14 @@ module.exports = {
         commentedbyusertype: usersetter(token),
         commentedby: token.id,
         comment: args.comment,
-        date: Date()
+        date: Date(),
       });
       await foundcard.save();
       await foundcard
         .populate({
           path: "comments.commentedby",
 
-          select: "name username _id lastname"
+          select: "name username _id lastname",
         })
         .execPopulate();
     } catch (err) {
@@ -170,5 +168,5 @@ module.exports = {
     }
 
     return foundcard.comments;
-  }
+  },
 };

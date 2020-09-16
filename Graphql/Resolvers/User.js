@@ -10,8 +10,8 @@ const transporter = nodemailer.createTransport(
   mg({
     auth: {
       api_key: process.env.EMAILAPIKEY,
-      domain: "sandboxefa9601426bb4278b6f4ae9b5b95161c.mailgun.org"
-    }
+      domain: "sandboxefa9601426bb4278b6f4ae9b5b95161c.mailgun.org",
+    },
   })
 );
 
@@ -22,7 +22,7 @@ module.exports = {
       name: undefined,
       username: undefined,
       lastname: undefined,
-      usertype: undefined
+      usertype: undefined,
     };
   },
   createUser: async (args, { req, res }) => {
@@ -38,7 +38,7 @@ module.exports = {
 
     try {
       newuser = await new user({
-        ...args.Input
+        ...args.Input,
       });
       await newuser.save();
     } catch (error) {
@@ -49,12 +49,11 @@ module.exports = {
       { id: newuser.id, usertype: "archos" },
       process.env.APP_SECRET,
       {
-        expiresIn: "1h"
+        expiresIn: "1h",
       }
     );
 
     res.cookie("access_token", token, { httpOnly: true });
-    console.log();
     return { ...newuser._doc, usertype: "archos" };
   },
   createFacebookUser: async (args, { req, res }) => {
@@ -65,10 +64,9 @@ module.exports = {
       res.status(500).send(errors[0]);
       return;
     }
-    console.log("passed");
     try {
       newuser = await new facebookuser({
-        ...args.Input
+        ...args.Input,
       });
       await newuser.save();
     } catch (error) {
@@ -79,11 +77,11 @@ module.exports = {
       {
         facebookid: args.Input.facebookid,
         id: newuser.id,
-        usertype: "facebook"
+        usertype: "facebook",
       },
       process.env.APP_SECRET,
       {
-        expiresIn: "1d"
+        expiresIn: "1d",
       }
     );
 
@@ -101,7 +99,7 @@ module.exports = {
     }
     try {
       newuser = await new gmailuser({
-        ...args.Input
+        ...args.Input,
       });
       await newuser.save();
     } catch (error) {
@@ -112,7 +110,7 @@ module.exports = {
       { gmailid: args.Input.gmailid, id: newuser.id, usertype: "gmail" },
       process.env.APP_SECRET,
       {
-        expiresIn: "1d"
+        expiresIn: "1d",
       }
     );
     res.cookie("token", token, { httpOnly: true });
@@ -122,7 +120,7 @@ module.exports = {
   loginFacebook: async (args, { req, res }) => {
     let {
       existingfacebookuser,
-      errors
+      errors,
     } = await uservalidator.loginFacebookUserValidator(args.Input);
 
     if (errors.length > 0) {
@@ -130,18 +128,18 @@ module.exports = {
       return;
     }
     const foundfacebookuser = await facebookuser.findOne({
-      facebookid: args.Input.id
+      facebookid: args.Input.id,
     });
 
     let token = jwt.sign(
       {
         facebookid: args.Input.id,
         id: foundfacebookuser.id,
-        usertype: "facebook"
+        usertype: "facebook",
       },
       process.env.APP_SECRET,
       {
-        expiresIn: "1d"
+        expiresIn: "1d",
       }
     );
     res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
@@ -149,14 +147,14 @@ module.exports = {
     return {
       ...existingfacebookuser._doc,
       usertype: "facebook",
-      httponly: true
+      httponly: true,
     };
   },
 
   loginGoogle: async (args, { req, res }) => {
     let {
       existinggmailuser,
-      errors
+      errors,
     } = await uservalidator.loginGmailUserValidator(args.Input);
 
     if (errors.length > 0) {
@@ -169,7 +167,7 @@ module.exports = {
       { gmailid: args.Input.id, id: foundgmailuser.id, usertype: "gmail" },
       process.env.APP_SECRET,
       {
-        expiresIn: "1d"
+        expiresIn: "1d",
       }
     );
     res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
@@ -190,12 +188,11 @@ module.exports = {
       { id: existinguser.id, usertype: "archos" },
       process.env.APP_SECRET,
       {
-        expiresIn: "1d"
+        expiresIn: "1d",
       }
     );
 
     res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
-    console.log(token);
     return { ...existinguser._doc, usertype: "archos" };
   },
   deleteUser: async (args, { req, res }) => {
@@ -240,12 +237,10 @@ module.exports = {
         return;
       }
     }
-    console.log(founduser);
     const jwtargs = [
       { id: founduser.id, usertype: decoded.usertype },
-      { expiresIn: "10m" }
+      { expiresIn: "10m" },
     ];
-    console.log(founduser.email);
     transporter.sendMail(
       {
         to: founduser.email,
@@ -255,21 +250,16 @@ module.exports = {
           jwtargs[0],
           process.env.APP_SECRET,
           jwtargs[1]
-        )}</h1>`
+        )}</h1>`,
       },
       (err, info) => {
         if (err) {
-          console.log(err);
         }
-        console.log(info);
       }
     );
-    console.log("asdasd");
-
     return { result: true };
   },
   deleteUserConfirmation: async (args, { req, res }) => {
-    console.log("aaa");
     let decoded;
     await jwt.verify(
       args.token,
@@ -283,11 +273,8 @@ module.exports = {
       }
     );
     let founduser;
-    console.log(decoded);
     await cards.deleteMany({ createdby: decoded.id });
-    console.log(decoded);
     if (decoded.usertype === "facebook") {
-      console.log("found");
       founduser = await facebookuser.findById(decoded.id);
       await facebookuser.findByIdAndDelete(decoded.id);
     } else if (decoded.usertype === "gmail") {
@@ -300,7 +287,6 @@ module.exports = {
     return { result: true };
   },
   changePassword: async (args, { req, res }) => {
-    console.log(args);
     let decoded;
     await jwt.verify(
       req.cookies.token,
@@ -331,9 +317,8 @@ module.exports = {
     }
     const jwtargs = [
       { id: founduser.id, usertype: decoded.usertype },
-      { expiresIn: "10m" }
+      { expiresIn: "10m" },
     ];
-    console.log(founduser.email);
     transporter.sendMail(
       {
         to: founduser.email,
@@ -343,22 +328,16 @@ module.exports = {
           jwtargs[0],
           process.env.APP_SECRET,
           jwtargs[1]
-        )}</h1>`
+        )}</h1>`,
       },
       (err, info) => {
         if (err) {
-          console.log(err);
         }
-        console.log(info);
       }
     );
-    console.log("asdasd");
-
     return { result: true };
   },
   changePasswordConfirmation: async (args, { req, res }) => {
-    console.log(args.token);
-    console.log(args);
     let decodedchangepswtoken;
     let decodedusertoken;
     await jwt.verify(
@@ -399,5 +378,5 @@ module.exports = {
     await founduser.set({ password: args.changepassword });
     await founduser.save();
     return { result: true };
-  }
+  },
 };
