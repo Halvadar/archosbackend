@@ -33,6 +33,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials",true)
   if (req.method === "OPTIONS") {
+    console.log('options')
     return res.sendStatus(200);
   }
   next();
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 
 
 app.get("/checklogin", async (req, res, next) => {
+  console.log(req.cookies)
   jwt.verify(
     req.cookies.token,
     process.env.APP_SECRET,
