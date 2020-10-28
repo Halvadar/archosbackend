@@ -52,7 +52,7 @@ app.get("/checklogin", async (req, res, next) => {
     process.env.APP_SECRET,
     async (err, decoded) => {
       if (err) {
-        return null;
+        res.send('no user')
       }
       let founduser;
       if (decoded.usertype === "archos") {
