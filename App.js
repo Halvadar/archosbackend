@@ -18,20 +18,21 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cookieparser());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-/* app.use(
+console.log(process.env.ORIGIN)
+app.use(
   cors({
     credentials: true,
     origin: process.env.ORIGIN,
   })
-); */
+);
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", process.env.ORIGIN);
+
   res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials",true)
+
+  console.log(req.url)
   if (req.method === "OPTIONS") {
     console.log('options')
     return res.sendStatus(200);
@@ -40,11 +41,12 @@ app.use((req, res, next) => {
 });
 
 app.get('/test',async (req,res,next)=>{
+  console.log(req.url)
   res.send('whats up')
 })
 
 app.get("/checklogin", async (req, res, next) => {
-  console.log(req.cookies)
+  console.log('passed')
   jwt.verify(
     req.cookies.token,
     process.env.APP_SECRET,
