@@ -28,7 +28,7 @@ app.use(
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", process.env.ORIGIN);
+  res.setHeader("Access-Control-Allow-Origin", '*');
   res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials",true)
@@ -37,9 +37,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use((req, res, next) => {
-  next();
-});
+
 
 app.get("/checklogin", async (req, res, next) => {
   jwt.verify(
