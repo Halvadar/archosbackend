@@ -19,12 +19,12 @@ app.use(bodyParser.json());
 app.use(cookieparser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(
+/* app.use(
   cors({
     credentials: true,
     origin: process.env.ORIGIN,
   })
-);
+); */
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
@@ -39,6 +39,9 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/test',async (req,res,next)=>{
+  res.send('whats up')
+})
 
 app.get("/checklogin", async (req, res, next) => {
   console.log(req.cookies)
