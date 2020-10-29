@@ -46,7 +46,7 @@ app.get('/test',async (req,res,next)=>{
 })
 
 app.get("/checklogin", async (req, res, next) => {
-  console.log(req.cookies.token)
+  console.log(req.cookies['asd'])
   jwt.verify(
     req.cookies.token,
     process.env.APP_SECRET,

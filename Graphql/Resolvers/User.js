@@ -170,8 +170,8 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
-
+    res.cookie("token", token, { expires: "1d", httpOnly: true });
+      res.cookie("asd",'asd')
     return { ...existinggmailuser._doc, usertype: "gmail" };
   },
   loginArchos: async (args, { req, res }) => {
