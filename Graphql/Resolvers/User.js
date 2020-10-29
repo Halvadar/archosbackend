@@ -169,7 +169,7 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { expiresIn: "1d", sameSite:'none' });
+    res.cookie("token", token, { expiresIn: "1d",  });
 
     return { ...existinggmailuser._doc, usertype: "gmail" };
   },

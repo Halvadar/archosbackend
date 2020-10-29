@@ -32,7 +32,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  console.log(req.url)
+  
   if (req.method === "OPTIONS") {
     console.log('options')
     return res.sendStatus(200);
@@ -41,12 +41,12 @@ app.use((req, res, next) => {
 });
 
 app.get('/test',async (req,res,next)=>{
-  console.log(req.url)
+  
   res.send('whats up')
 })
 
 app.get("/checklogin", async (req, res, next) => {
-  console.log('passed')
+  console.log(req.cookies)
   jwt.verify(
     req.cookies.token,
     process.env.APP_SECRET,
