@@ -53,7 +53,7 @@ module.exports = {
       }
     );
 
-    res.cookie("access_token", token, { });
+    res.cookie("access_token", token, { httpOnly: true });
     return { ...newuser._doc, usertype: "archos" };
   },
   createFacebookUser: async (args, { req, res }) => {
@@ -85,7 +85,7 @@ module.exports = {
       }
     );
 
-    res.cookie("token", token, { });
+    res.cookie("token", token, { httpOnly: true });
 
     return { ...newuser._doc, usertype: "facebook" };
   },
@@ -113,7 +113,7 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { });
+    res.cookie("token", token, { httpOnly: true });
 
     return { ...newuser._doc, usertype: "gmail" };
   },
@@ -142,11 +142,12 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { expiresIn: "1d", });
+    res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
 
     return {
       ...existingfacebookuser._doc,
       usertype: "facebook",
+      httponly: true,
     };
   },
 
@@ -169,7 +170,7 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { expiresIn: "1d",  });
+    res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
 
     return { ...existinggmailuser._doc, usertype: "gmail" };
   },
@@ -191,7 +192,7 @@ module.exports = {
       }
     );
 
-    res.cookie("token", token, { expiresIn: "1d", });
+    res.cookie("token", token, { expiresIn: "1d", httpOnly: true });
     return { ...existinguser._doc, usertype: "archos" };
   },
   deleteUser: async (args, { req, res }) => {
