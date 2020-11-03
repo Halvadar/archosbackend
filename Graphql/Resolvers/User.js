@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport(
 
 module.exports = {
   logoutUser: (args, { req, res }) => {
-    res.clearCookie("token");
+    res.clearCookie("token",{ httpOnly: true,sameSite:'none',secure:true });
     return {
       name: undefined,
       username: undefined,
