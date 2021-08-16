@@ -4,20 +4,23 @@ const nodemailer = require("nodemailer");
 const uservalidator = require("../../Validators/User");
 const jwt = require("jsonwebtoken");
 const cards = require("../../Models/Cards");
-const mg = require("nodemailer-mailgun-transport");
+const mandrillTransport = require("nodemailer-mandrill-transport");
 
 const transporter = nodemailer.createTransport(
-  mg({
+  mandrillTransport({
     auth: {
-      api_key: process.env.EMAILAPIKEY,
-      domain: "sandboxefa9601426bb4278b6f4ae9b5b95161c.mailgun.org",
+      apiKey: process.env.MANDRILL_KEY,
     },
   })
 );
 
 module.exports = {
   logoutUser: (args, { req, res }) => {
-    res.clearCookie("token",{ httpOnly: true,sameSite:'none',secure:true });
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
     return {
       name: undefined,
       username: undefined,
@@ -53,7 +56,11 @@ module.exports = {
       }
     );
 
-    res.cookie("access_token", token, { httpOnly: true,sameSite:'none',secure:true });
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
     return { ...newuser._doc, usertype: "archos" };
   },
   createFacebookUser: async (args, { req, res }) => {
@@ -85,7 +92,12 @@ module.exports = {
       }
     );
 
-    res.cookie("token", token, { maxAge:100000000, httpOnly: true, sameSite:'none',secure:true })
+    res.cookie("token", token, {
+      maxAge: 100000000,
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
 
     return { ...newuser._doc, usertype: "facebook" };
   },
@@ -113,15 +125,18 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { maxAge:100000000, httpOnly: true, sameSite:'none',secure:true });
+    res.cookie("token", token, {
+      maxAge: 100000000,
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
 
     return { ...newuser._doc, usertype: "gmail" };
   },
   loginFacebook: async (args, { req, res }) => {
-    let {
-      existingfacebookuser,
-      errors,
-    } = await uservalidator.loginFacebookUserValidator(args.Input);
+    let { existingfacebookuser, errors } =
+      await uservalidator.loginFacebookUserValidator(args.Input);
 
     if (errors.length > 0) {
       res.status(500).send(errors[0]);
@@ -142,7 +157,12 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { maxAge:100000000, httpOnly: true, sameSite:'none',secure:true });
+    res.cookie("token", token, {
+      maxAge: 100000000,
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
 
     return {
       ...existingfacebookuser._doc,
@@ -152,10 +172,8 @@ module.exports = {
   },
 
   loginGoogle: async (args, { req, res }) => {
-    let {
-      existinggmailuser,
-      errors,
-    } = await uservalidator.loginGmailUserValidator(args.Input);
+    let { existinggmailuser, errors } =
+      await uservalidator.loginGmailUserValidator(args.Input);
 
     if (errors.length > 0) {
       res.status(500).send(errors[0]);
@@ -170,8 +188,13 @@ module.exports = {
         expiresIn: "1d",
       }
     );
-    res.cookie("token", token, { maxAge:100000000, httpOnly: true, sameSite:'none',secure:true });
-      
+    res.cookie("token", token, {
+      maxAge: 100000000,
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
+
     return { ...existinggmailuser._doc, usertype: "gmail" };
   },
   loginArchos: async (args, { req, res }) => {
@@ -192,7 +215,12 @@ module.exports = {
       }
     );
 
-    res.cookie("token", token, { maxAge:100000000, httpOnly: true, sameSite:'none',secure:true });
+    res.cookie("token", token, {
+      maxAge: 100000000,
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
     return { ...existinguser._doc, usertype: "archos" };
   },
   deleteUser: async (args, { req, res }) => {
@@ -254,7 +282,9 @@ module.exports = {
       },
       (err, info) => {
         if (err) {
+          console.log("rqrqrqrqr", err);
         }
+        console.log(info);
       }
     );
     return { result: true };

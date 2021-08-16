@@ -18,7 +18,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cookieparser());
 app.use(bodyParser.urlencoded({ extended: true }));
-console.log(process.env.ORIGIN)
+console.log(process.env.ORIGIN);
 app.use(
   cors({
     credentials: true,
@@ -28,31 +28,27 @@ app.use(
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
-  res.setHeader("Aceess-Control-Allow-Credentials",true),
-  res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+  res.setHeader("Aceess-Control-Allow-Credentials", true),
+    res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  
   if (req.method === "OPTIONS") {
-    
     return res.sendStatus(200);
   }
   next();
 });
 
-app.get('/test',async (req,res,next)=>{
-  
-  res.send('whats up')
-})
+app.get("/test", async (req, res, next) => {
+  res.send("whats up");
+});
 
 app.get("/checklogin", async (req, res, next) => {
-  console.log(req.cookies['asd'])
   jwt.verify(
     req.cookies.token,
     process.env.APP_SECRET,
     async (err, decoded) => {
       if (err) {
-        res.send('no user')
+        res.send("no user");
       }
       let founduser;
       if (decoded.usertype === "archos") {
