@@ -264,7 +264,7 @@ module.exports = {
     try {
       await sgMail.send({
         to: founduser.email,
-        from: "Archos@verification.com",
+        from: "archosmanageuser@gmail.com",
         subject: "Email Verification code",
         html: `<h1>This will expire in 10 minutes - ${jwt.sign(
           jwtargs[0],
@@ -340,7 +340,7 @@ module.exports = {
     try {
       await sgMail.send({
         to: founduser.email,
-        from: "Archos@verification.com",
+        from: "archosmanageuser@gmail.com",
         subject: "Email Verification code",
         html: `<h1>This will expire in 10 minutes - ${jwt.sign(
           jwtargs[0],
