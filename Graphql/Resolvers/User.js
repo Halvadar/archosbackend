@@ -1,18 +1,10 @@
 const { user, facebookuser, gmailuser } = require("../../Models/Users");
-const nodemailer = require("nodemailer");
 
 const uservalidator = require("../../Validators/User");
 const jwt = require("jsonwebtoken");
 const cards = require("../../Models/Cards");
-const mandrillTransport = require("nodemailer-mandrill-transport");
-
-const transporter = nodemailer.createTransport(
-  mandrillTransport({
-    auth: {
-      apiKey: process.env.MANDRILL_KEY,
-    },
-  })
-);
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = {
   logoutUser: (args, { req, res }) => {
@@ -269,8 +261,8 @@ module.exports = {
       { id: founduser.id, usertype: decoded.usertype },
       { expiresIn: "10m" },
     ];
-    transporter.sendMail(
-      {
+    try {
+      await sgMail.send({
         to: founduser.email,
         from: "Archos@verification.com",
         subject: "Email Verification code",
@@ -279,14 +271,10 @@ module.exports = {
           process.env.APP_SECRET,
           jwtargs[1]
         )}</h1>`,
-      },
-      (err, info) => {
-        if (err) {
-          console.log("rqrqrqrqr", err);
-        }
-        console.log(info);
-      }
-    );
+      });
+    } catch (err) {
+      console.log(err);
+    }
     return { result: true };
   },
   deleteUserConfirmation: async (args, { req, res }) => {
@@ -349,8 +337,8 @@ module.exports = {
       { id: founduser.id, usertype: decoded.usertype },
       { expiresIn: "10m" },
     ];
-    transporter.sendMail(
-      {
+    try {
+      await sgMail.send({
         to: founduser.email,
         from: "Archos@verification.com",
         subject: "Email Verification code",
@@ -359,12 +347,10 @@ module.exports = {
           process.env.APP_SECRET,
           jwtargs[1]
         )}</h1>`,
-      },
-      (err, info) => {
-        if (err) {
-        }
-      }
-    );
+      });
+    } catch (err) {
+      console.log(err);
+    }
     return { result: true };
   },
   changePasswordConfirmation: async (args, { req, res }) => {
