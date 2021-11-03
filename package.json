@@ -34,7 +34,7 @@
     "nodemailer-mailgun-transport": "^2.0.1",
     "nodemailer-mandrill-transport": "^1.2.0",
     "request": "^2.88.2",
-    "validator": "^12.2.0"
+    "validator": "^13.7.0"
   },
   "description": ""
 }
